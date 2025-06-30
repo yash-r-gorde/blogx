@@ -2,10 +2,9 @@ import clsx from "clsx";
 
 interface AvatarProps {
   authorName: string;
-  size?: string;
 }
 
-export const Avatar = ({ authorName, size = "10" }: AvatarProps) => {
+export const Avatar = ({ authorName }: AvatarProps) => {
   const initials = authorName
     ?.split(" ")
     .map((word) => word[0]?.toUpperCase())
