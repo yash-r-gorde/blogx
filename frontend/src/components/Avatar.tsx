@@ -17,8 +17,8 @@ export const Avatar = ({ authorName, size = "10" }: AvatarProps) => {
     <div
       className={clsx(
         "relative inline-flex items-center justify-center overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600",
-        `w-${size}`,
-        `h-${size}`
+        `w-10`,
+        `h-10`
       )}
     >
       <span className="font-medium text-gray-600 dark:text-gray-300">
