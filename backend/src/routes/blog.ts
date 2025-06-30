@@ -28,7 +28,6 @@ router.post('/', async (c: Context) => {
     if (!success) {
         return c.json({ message: "Invalid inputs" }, 422)
     }
-
     try {
         const post = await prisma.post.create({
             data: {
@@ -81,12 +80,20 @@ router.get('/bulk', async (c: Context) => {
     }).$extends(withAccelerate())
 
     try {
-        const posts = await prisma.post.findMany()
+        const posts = await prisma.post.findMany({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        })
         return c.json({
-            posts: posts.map(post => ({
-                id: post.id,
-                title: post.title
-            }))
+            posts
         })
     } catch (error) {
         return c.json({ message: 'Internal Server Error' }, 500)
@@ -110,6 +117,16 @@ router.get('/:id', async (c: Context) => {
         const post = await prisma.post.findFirst({
             where: {
                 id
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: {
+                        name: true,
+                    }
+                }
             }
         })
         return c.json({ post }, 200)

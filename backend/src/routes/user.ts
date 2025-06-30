@@ -4,16 +4,47 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign, verify } from 'hono/jwt'
 import bcryptjs from "bcryptjs"
 import { signupSchema, Signup, signinSchema, Signin } from '@yash-r-gorde/blogx-common';
+import authMiddleware from '../middleware';
 
-const router = new Hono<{ 
+const router = new Hono<{
   Bindings: {
     DATABASE_URL: string
     JWT_SECRET: string
   },
-  Variables : {
-		userId: string
-	}
+  Variables: {
+    userId: string
+  }
 }>();
+
+router.get('/me', authMiddleware, async (c: Context) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env?.DATABASE_URL,
+  }).$extends(withAccelerate())
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: c.get('userId')
+      },
+      select: {
+        id: true,
+        name: true
+      }
+    })
+
+    if (!user) {
+      return c.json({ message: "User not found" }, 403);
+    }
+
+    return c.json({
+      user
+    }, 200)
+
+  } catch (error) {
+    return c.json({ error: "Internal server error" }, 500);
+  }
+})
+
 
 router.post('/signup', async (c: Context) => {
   const prisma = new PrismaClient({

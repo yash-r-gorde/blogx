@@ -1,6 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 import { Context, Next } from "hono"
 import { verify } from "hono/jwt";
+import { contextStorage } from 'hono/context-storage';
 
 const authMiddleware = createMiddleware< {
   Bindings: {
@@ -20,8 +21,8 @@ const authMiddleware = createMiddleware< {
   const token = authorization.split(' ')[1]
 
   try {
-    const { id } = await verify(token, c.env?.JWT_SECRET)
-    c.set('userId', `${id}`)
+    const { userId } = await verify(token, c.env?.JWT_SECRET)
+    c.set('userId', `${userId}`)
     await next();
   } catch (error) {
     return c.json({ message: "Unauthorized" }, 401)
