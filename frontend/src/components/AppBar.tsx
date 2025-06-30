@@ -1,7 +1,24 @@
+import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar"
 import { Link } from "react-router-dom"
+import axios from "axios";
+import type { AxiosResponse, AxiosError } from "axios";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 
 export const AppBar = () => {
+  const [authorName, setAuthorName] = useState("")
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/v1/user/me`, { 'headers': { 'Authorization': localStorage.getItem('token') } })
+      .then((response: AxiosResponse) => {
+        setAuthorName(response.data.user.name)
+      })
+        .catch((error: AxiosError) => {
+          console.log(error);
+        });
+  }, [])
+
   return (
     <div className="flex items-center justify-between border-b-1 border-gray-200 w-screen pt-3 pb-3 pr-10 pl-10">
       <Link to="/blogs">
@@ -16,7 +33,7 @@ export const AppBar = () => {
             Publish
           </button>
         </Link>
-        <Avatar authorName={"Yash Gorde"} size={10} />
+        <Avatar authorName={authorName} />
       </div>
     </div>
   );
